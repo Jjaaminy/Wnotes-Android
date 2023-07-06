@@ -3,12 +3,12 @@
     android:description="@string/app_widget_description"
     android:initialKeyguardLayout="@layout/notes_widget"
     android:initialLayout="@layout/notes_widget"
-    android:minWidth="110dp"
+    android:minWidth="210dp"
     android:minHeight="110dp"
-    android:previewImage="@drawable/example_appwidget_preview"
+    android:previewImage="@drawable/logo"
 
     android:previewLayout="@layout/notes_widget"
-    android:targetCellWidth="2"
+    android:targetCellWidth="3"
     android:targetCellHeight="2"
-    android:updatePeriodMillis="86400000"
+    android:updatePeriodMillis="0"
     android:widgetCategory="home_screen" />

@@ -1,24 +1,21 @@
 package com.example.wnotes;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.collection.CircularArray;
-import androidx.recyclerview.widget.RecyclerView;
 
-import android.annotation.SuppressLint;
+import androidx.appcompat.app.AppCompatActivity;
+
+
+
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
-import android.view.View;
-import android.widget.AdapterView;
+
+import android.util.Log;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
+
 
 import java.util.ArrayList;
 
@@ -28,11 +25,12 @@ public class MainActivity extends AppCompatActivity {
     private Button hinzufügen;
     public ListView list;
 
-    static ArrayList<String> notizenliste = new ArrayList<>();
+    private TextView textView;
+
+    public static ArrayList<String> notizenliste = new ArrayList<>();
     static ArrayAdapter<String> adapter;
 
     static SharedPreferences sharedPreferences;
-
 
 
     @Override
@@ -46,9 +44,15 @@ public class MainActivity extends AppCompatActivity {
         adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, notizenliste);
         list.setAdapter(adapter);
 
-        String savedNote = sharedPreferences.getString("note", "");
-        notizenliste.add(savedNote);
-        adapter.notifyDataSetChanged();
+        loadNotesFromSharedPreferences();
+
+        String savedNotes = sharedPreferences.getString("notes", "");
+        if (!savedNotes.isEmpty()) {
+            String[] notesArray = savedNotes.split(",");
+            for (String note : notesArray) {
+                notizenliste.add(note);
+            }
+        }
 
         //liste auswählen
         list.setOnItemClickListener((parent, view, position, id) -> {
@@ -65,24 +69,60 @@ public class MainActivity extends AppCompatActivity {
         });
 
         //button hinzufügen
-        hinzufügen.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(MainActivity.this, EditActivity.class);
-                startActivity(intent);
-            }
+        hinzufügen.setOnClickListener(view -> {
+            Intent intent = new Intent(MainActivity.this, EditActivity.class);
+            startActivity(intent);
         });
     }
 
+
+
+
+
     //hinzufügen zu der Liste
     public static void addNewNote(String note) {
-        notizenliste.add(note);
-        adapter.notifyDataSetChanged();
+        if (!notizenliste.contains(note)) {
+            notizenliste.add(note);
+            adapter.notifyDataSetChanged();
+            saveNotesToSharedPreferences();
+            Log.d("MainActivity", "Anzahl der Notizen: " + notizenliste.size());
+
+        }
     }
 
     //löschen
     public static void deleteNote(int position) {
-       notizenliste.remove(position);
-       adapter.notifyDataSetChanged();
+        notizenliste.remove(position);
+        adapter.notifyDataSetChanged();
+        saveNotesToSharedPreferences();
+        Log.d("MainActivity", "Anzahl der Notizen: " + notizenliste.size());
+
+    }
+
+
+    private static void saveNotesToSharedPreferences() {
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        StringBuilder notesString = new StringBuilder();
+        for (String note : notizenliste) {
+            notesString.append(note).append(",");
+        }
+        editor.putString("notes", notesString.toString());
+        editor.apply();
+    }
+
+    private void loadNotesFromSharedPreferences() {
+        String savedNotes = sharedPreferences.getString("notes", "");
+        if (!savedNotes.isEmpty()) {
+            String[] notesArray = savedNotes.split(",");
+            for (String note : notesArray) {
+                notizenliste.add(note);
+
+            }
+        }
+        Log.d("MainActivity", "Anzahl der Notizen: " + notizenliste.size());
+    }
+
+    public static ArrayList<String> getNotizenliste() {
+        return notizenliste;
     }
 }
