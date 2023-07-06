@@ -33,7 +33,7 @@ public class EditActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 String editedNote = text.getText().toString();
-
+                MainActivity.addNewNote(editedNote);
                 // Notiz speichern
                 SharedPreferences sharedPreferences = getSharedPreferences("notes", MODE_PRIVATE);
                 SharedPreferences.Editor editor = sharedPreferences.edit();

@@ -31,6 +31,9 @@ public class MainActivity extends AppCompatActivity {
     static ArrayList<String> notizenliste = new ArrayList<>();
     static ArrayAdapter<String> adapter;
 
+    static SharedPreferences sharedPreferences;
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,15 +42,15 @@ public class MainActivity extends AppCompatActivity {
         hinzufügen = findViewById(R.id.button);
         list = findViewById(R.id.listview);
 
-        notizenliste = new ArrayList<>();
+        sharedPreferences = getSharedPreferences("notes", Context.MODE_PRIVATE);
         adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, notizenliste);
         list.setAdapter(adapter);
 
-        SharedPreferences sharedPreferences = getSharedPreferences("notes", Context.MODE_PRIVATE);
         String savedNote = sharedPreferences.getString("note", "");
         notizenliste.add(savedNote);
         adapter.notifyDataSetChanged();
 
+        //liste auswählen
         list.setOnItemClickListener((parent, view, position, id) -> {
             String selectedNote = notizenliste.get(position);
             // EditActivity öffnen und ausgewählte Notiz übergeben
@@ -56,13 +59,30 @@ public class MainActivity extends AppCompatActivity {
             startActivity(intent);
         });
 
-        hinzufügen.setOnClickListener(new View.OnClickListener() {
+        list.setOnItemLongClickListener((parent, view, position, id) -> {
+            deleteNote(position);
+            return true;
+        });
 
+        //button hinzufügen
+        hinzufügen.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(MainActivity.this, EditActivity.class);
                 startActivity(intent);
             }
         });
+    }
+
+    //hinzufügen zu der Liste
+    public static void addNewNote(String note) {
+        notizenliste.add(note);
+        adapter.notifyDataSetChanged();
+    }
+
+    //löschen
+    public static void deleteNote(int position) {
+       notizenliste.remove(position);
+       adapter.notifyDataSetChanged();
     }
 }
