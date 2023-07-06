@@ -1,71 +1,46 @@
 package com.example.wnotes;
 
-import android.annotation.SuppressLint;
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.text.Editable;
-import android.text.TextWatcher;
+import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import java.util.ArrayList;
-import java.util.Set;
-
 
 public class EditActivity extends AppCompatActivity {
-    int idnotes;
+
     private Button speichern;
     private EditText text;
-    Intent intent = getIntent();
 
 
-    SharedPreferences.Editor editor = getSharedPreferences("edit",MODE_PRIVATE).edit();
-
-
-    @SuppressLint("MissingInflatedId")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_edit);
         speichern = findViewById(R.id.button);
         text = findViewById(R.id.edittext);
 
-        idnotes = intent.getIntExtra("id", -1);
-        if (idnotes != -1) {
-            text.setText(MainActivity.notizenliste.get(idnotes));
-        } else {
-            MainActivity.notizenliste.add("");
-            idnotes = MainActivity.notizenliste.size() - 1;
-            MainActivity.adapter.notifyDataSetChanged();
+        if (getIntent().hasExtra("note")) {
+            String note = getIntent().getStringExtra("note");
+            text.setText(note);
         }
 
-        text.addTextChangedListener(new TextWatcher() {
+        speichern.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+            public void onClick(View view) {
+                String editedNote = text.getText().toString();
 
+                // Notiz speichern
+                SharedPreferences sharedPreferences = getSharedPreferences("notes", MODE_PRIVATE);
+                SharedPreferences.Editor editor = sharedPreferences.edit();
+                editor.putString("note", editedNote);
+                editor.apply();
+                finish(); // EditActivity schließen            }
             }
-
-            @Override
-            public void onTextChanged(CharSequence input, int i, int i1, int i2) {
-                MainActivity.notizenliste.set(idnotes, String.valueOf(input));
-                MainActivity.adapter.notifyDataSetChanged();
-                SharedPreferences sharedPreferences = getApplication().getSharedPreferences("noteslist", Context.MODE_PRIVATE);
-                ArrayList<String> set = new ArrayList<String>(MainActivity.notizenliste);
-                sharedPreferences.edit().putStringSet("note", (Set<String>) set).apply();
-
-            }
-
-
-            @Override
-            public void afterTextChanged(Editable editable) {
-
-            }
-        }
-        );
+        });
     }
 }

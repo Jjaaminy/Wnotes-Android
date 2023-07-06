@@ -31,55 +31,37 @@ public class MainActivity extends AppCompatActivity {
     static ArrayList<String> notizenliste = new ArrayList<>();
     static ArrayAdapter<String> adapter;
 
-    @Override
-    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        super.onOptionsItemSelected(item);
 
-        if (item.getItemId() == R.id.button) {
-
-            // Going from MainActivity to NotesEditorActivity
-            Intent intent = new Intent(getApplicationContext(), EditActivity.class);
-            startActivity(intent);
-            return true;
-        }
-
-        return false;
-    }
-
-    @SuppressLint("ResourceType")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         hinzufügen = findViewById(R.id.button);
-        list = findViewById(R.id.recyclerView);
+        list = findViewById(R.id.listview);
 
-        SharedPreferences sharedPreferences = getApplicationContext().getSharedPreferences("notes", Context.MODE_PRIVATE);
-        ArrayList<String> set = (ArrayList<String>) sharedPreferences.getStringSet("notes", null);
+        notizenliste = new ArrayList<>();
+        adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, notizenliste);
+        list.setAdapter(adapter);
 
+        SharedPreferences sharedPreferences = getSharedPreferences("notes", Context.MODE_PRIVATE);
+        String savedNote = sharedPreferences.getString("note", "");
+        notizenliste.add(savedNote);
+        adapter.notifyDataSetChanged();
 
-        if (set == null) {
-            notizenliste.add("Ex. note");
-        } else {
-            notizenliste = new ArrayList<>(set);
-        }
-
-        adapter = new ArrayAdapter<>(this, R.id.recyclerView, notizenliste);
-
-        list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-
-                Intent intent = new Intent(getApplicationContext(), EditActivity.class);
-                intent.putExtra("noteid", i);
-                startActivity(intent);
-            }
+        list.setOnItemClickListener((parent, view, position, id) -> {
+            String selectedNote = notizenliste.get(position);
+            // EditActivity öffnen und ausgewählte Notiz übergeben
+            Intent intent = new Intent(MainActivity.this, EditActivity.class);
+            intent.putExtra("note", selectedNote);
+            startActivity(intent);
         });
 
         hinzufügen.setOnClickListener(new View.OnClickListener() {
+
             @Override
             public void onClick(View view) {
-                startActivity(new Intent(MainActivity.this, EditActivity.class));
+                Intent intent = new Intent(MainActivity.this, EditActivity.class);
+                startActivity(intent);
             }
         });
     }
