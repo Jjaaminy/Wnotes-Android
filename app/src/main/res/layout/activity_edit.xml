@@ -38,11 +38,11 @@
         android:layout_marginStart="44dp"
         android:layout_marginBottom="8dp"
         android:text="Füge dein Text ein:"
-        app:layout_constraintBottom_toTopOf="@+id/textInputEditText"
+        app:layout_constraintBottom_toTopOf="@+id/edittext"
         app:layout_constraintStart_toStartOf="parent" />
 
     <EditText
-        android:id="@+id/textInputEditText"
+        android:id="@+id/edittext"
         android:layout_width="299dp"
         android:layout_height="288dp"
         android:layout_marginStart="44dp"
